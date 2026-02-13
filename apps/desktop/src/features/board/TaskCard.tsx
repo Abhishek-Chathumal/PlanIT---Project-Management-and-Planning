@@ -9,6 +9,7 @@ import type { Task } from '../../api';
 interface TaskCardProps {
   task: Task;
   isDragOverlay?: boolean;
+  onClick?: () => void;
 }
 
 const PRIORITY_LABELS: Record<string, string> = {
@@ -18,7 +19,7 @@ const PRIORITY_LABELS: Record<string, string> = {
   LOW: 'Low',
 };
 
-export function TaskCard({ task, isDragOverlay }: TaskCardProps) {
+export function TaskCard({ task, isDragOverlay, onClick }: TaskCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
   });
@@ -33,11 +34,22 @@ export function TaskCard({ task, isDragOverlay }: TaskCardProps) {
   const subtaskCount = task._count?.subtasks ?? 0;
   const commentCount = task._count?.comments ?? 0;
 
+  const handleClick = (e: React.MouseEvent) => {
+    // Only open detail if not dragging and not clicking the drag handle
+    if (!isDragging && onClick) {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.drag-handle')) {
+        onClick();
+      }
+    }
+  };
+
   return (
     <div
       ref={!isDragOverlay ? setNodeRef : undefined}
       style={!isDragOverlay ? style : undefined}
       className={`task-card ${isDragOverlay ? 'task-card-overlay' : ''} ${isDragging ? 'task-card-dragging' : ''}`}
+      onClick={!isDragOverlay ? handleClick : undefined}
     >
       {/* Drag handle */}
       <div className="drag-handle" {...(!isDragOverlay ? { ...attributes, ...listeners } : {})}>
