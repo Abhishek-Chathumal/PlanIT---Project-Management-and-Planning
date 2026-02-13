@@ -57,6 +57,29 @@ export default [
         },
     },
 
+    // Backend services — Node.js globals
+    {
+        files: ["services/**/*.ts"],
+        languageOptions: {
+            globals: {
+                process: "readonly",
+                console: "readonly",
+                __dirname: "readonly",
+                __filename: "readonly",
+                module: "readonly",
+                require: "readonly",
+                Buffer: "readonly",
+                setTimeout: "readonly",
+                setInterval: "readonly",
+                clearTimeout: "readonly",
+                clearInterval: "readonly",
+            },
+        },
+        rules: {
+            "no-console": ["warn", { allow: ["log", "warn", "error", "info"] }],
+        },
+    },
+
     // Disable formatting rules (handled by Prettier)
     prettierConfig,
 ];
