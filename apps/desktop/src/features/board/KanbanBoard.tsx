@@ -16,12 +16,15 @@ import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useBoardStore } from '../../stores/board-store';
 import { BucketColumn } from './BucketColumn';
 import { TaskCard } from './TaskCard';
+import { TaskDetailPanel } from './TaskDetailPanel';
 import type { Task } from '../../api';
 import './KanbanBoard.css';
 
 export function KanbanBoard() {
-  const { buckets, tasksByBucket, moveTask } = useBoardStore();
+  const { buckets, tasksByBucket, moveTask, updateTaskInStore, deleteTaskFromStore } =
+    useBoardStore();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -97,22 +100,38 @@ export function KanbanBoard() {
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="kanban-container">
-        {buckets.map((bucket) => (
-          <BucketColumn key={bucket.id} bucket={bucket} tasks={tasksByBucket[bucket.id] ?? []} />
-        ))}
-      </div>
+    <>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="kanban-container">
+          {buckets.map((bucket) => (
+            <BucketColumn
+              key={bucket.id}
+              bucket={bucket}
+              tasks={tasksByBucket[bucket.id] ?? []}
+              onTaskClick={(taskId) => setSelectedTaskId(taskId)}
+            />
+          ))}
+        </div>
 
-      <DragOverlay dropAnimation={null}>
-        {activeTask ? <TaskCard task={activeTask} isDragOverlay /> : null}
-      </DragOverlay>
-    </DndContext>
+        <DragOverlay dropAnimation={null}>
+          {activeTask ? <TaskCard task={activeTask} isDragOverlay /> : null}
+        </DragOverlay>
+      </DndContext>
+
+      {selectedTaskId && (
+        <TaskDetailPanel
+          taskId={selectedTaskId}
+          onClose={() => setSelectedTaskId(null)}
+          onUpdate={(updated) => updateTaskInStore(updated)}
+          onDelete={(id) => deleteTaskFromStore(id)}
+        />
+      )}
+    </>
   );
 }

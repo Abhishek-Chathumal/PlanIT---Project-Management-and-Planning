@@ -20,6 +20,8 @@ interface BoardState {
     newIndex: number,
   ) => Promise<void>;
   addTask: (bucketId: string, title: string) => Promise<void>;
+  updateTaskInStore: (task: Task) => void;
+  deleteTaskFromStore: (taskId: string) => void;
 }
 
 export const useBoardStore = create<BoardState>((set, get) => ({
@@ -129,5 +131,23 @@ export const useBoardStore = create<BoardState>((set, get) => ({
     } catch {
       // Silently fail — could show toast in future
     }
+  },
+
+  updateTaskInStore: (task) => {
+    const { tasksByBucket } = get();
+    const updated: Record<string, Task[]> = {};
+    for (const [bucketId, tasks] of Object.entries(tasksByBucket)) {
+      updated[bucketId] = tasks.map((t) => (t.id === task.id ? task : t));
+    }
+    set({ tasksByBucket: updated });
+  },
+
+  deleteTaskFromStore: (taskId) => {
+    const { tasksByBucket } = get();
+    const updated: Record<string, Task[]> = {};
+    for (const [bucketId, tasks] of Object.entries(tasksByBucket)) {
+      updated[bucketId] = tasks.filter((t) => t.id !== taskId);
+    }
+    set({ tasksByBucket: updated });
   },
 }));

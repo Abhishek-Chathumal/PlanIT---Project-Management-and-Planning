@@ -12,9 +12,10 @@ import type { Bucket, Task } from '../../api';
 interface BucketColumnProps {
   bucket: Bucket;
   tasks: Task[];
+  onTaskClick?: (taskId: string) => void;
 }
 
-export function BucketColumn({ bucket, tasks }: BucketColumnProps) {
+export function BucketColumn({ bucket, tasks, onTaskClick }: BucketColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: bucket.id });
   const addTask = useBoardStore((s) => s.addTask);
   const [isAdding, setIsAdding] = useState(false);
@@ -45,7 +46,7 @@ export function BucketColumn({ bucket, tasks }: BucketColumnProps) {
       <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
         <div className="bucket-tasks">
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} />
+            <TaskCard key={task.id} task={task} onClick={() => onTaskClick?.(task.id)} />
           ))}
         </div>
       </SortableContext>
