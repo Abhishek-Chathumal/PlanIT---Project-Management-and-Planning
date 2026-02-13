@@ -2,13 +2,18 @@ import { Test } from '@nestjs/testing';
 import { NotificationsService } from './notifications.service';
 import { PrismaService } from './prisma.service';
 
+const MOCK_USER_ID = 'test-user-001';
+const MOCK_USER_ID_2 = 'test-user-002';
+const MOCK_USER_ID_3 = 'test-user-003';
+const MOCK_NOTIF_ID = 'test-notif-001';
+
 const mockNotification = {
-  id: 'notif-1',
+  id: MOCK_NOTIF_ID,
   type: 'TASK_ASSIGNED',
   title: 'New task assigned',
   message: 'John assigned you to "Build API"',
   read: false,
-  userId: 'user-1',
+  userId: MOCK_USER_ID,
   createdAt: new Date(),
 };
 
@@ -43,7 +48,7 @@ describe('NotificationsService', () => {
         type: 'TASK_ASSIGNED',
         title: 'New task',
         message: 'You have a new task',
-        userId: 'user-1',
+        userId: MOCK_USER_ID,
       });
 
       expect(result).toEqual(mockNotification);
@@ -53,11 +58,11 @@ describe('NotificationsService', () => {
   describe('findAllForUser', () => {
     it('should return last 50 notifications ordered by date desc', async () => {
       mockPrisma.notification.findMany.mockResolvedValue([mockNotification]);
-      const result = await service.findAllForUser('user-1');
+      const result = await service.findAllForUser(MOCK_USER_ID);
       expect(result).toHaveLength(1);
       expect(mockPrisma.notification.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { userId: 'user-1' },
+          where: { userId: MOCK_USER_ID },
           orderBy: { createdAt: 'desc' },
           take: 50,
         }),
@@ -68,7 +73,7 @@ describe('NotificationsService', () => {
   describe('getUnreadCount', () => {
     it('should return count of unread notifications', async () => {
       mockPrisma.notification.count.mockResolvedValue(5);
-      const result = await service.getUnreadCount('user-1');
+      const result = await service.getUnreadCount(MOCK_USER_ID);
       expect(result).toBe(5);
     });
   });
@@ -80,7 +85,7 @@ describe('NotificationsService', () => {
         read: true,
       });
 
-      const result = await service.markAsRead('notif-1');
+      const result = await service.markAsRead(MOCK_NOTIF_ID);
       expect(result.read).toBe(true);
     });
   });
@@ -88,7 +93,7 @@ describe('NotificationsService', () => {
   describe('markAllAsRead', () => {
     it('should update all unread notifications for user', async () => {
       mockPrisma.notification.updateMany.mockResolvedValue({ count: 3 });
-      const result = await service.markAllAsRead('user-1');
+      const result = await service.markAllAsRead(MOCK_USER_ID);
       expect(result.count).toBe(3);
     });
   });
@@ -96,9 +101,9 @@ describe('NotificationsService', () => {
   describe('delete', () => {
     it('should delete notification', async () => {
       mockPrisma.notification.delete.mockResolvedValue(mockNotification);
-      await service.delete('notif-1');
+      await service.delete(MOCK_NOTIF_ID);
       expect(mockPrisma.notification.delete).toHaveBeenCalledWith({
-        where: { id: 'notif-1' },
+        where: { id: MOCK_NOTIF_ID },
       });
     });
   });
@@ -111,14 +116,14 @@ describe('NotificationsService', () => {
 
       await service.onTaskAssigned({
         taskTitle: 'Build API',
-        assigneeId: 'user-2',
+        assigneeId: MOCK_USER_ID_2,
         assignerName: 'John',
       });
 
       expect(mockPrisma.notification.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           type: 'TASK_ASSIGNED',
-          userId: 'user-2',
+          userId: MOCK_USER_ID_2,
         }),
       });
     });
@@ -131,7 +136,7 @@ describe('NotificationsService', () => {
       await service.onTaskCompleted({
         taskTitle: 'Fix bug',
         completedBy: 'Jane',
-        creatorId: 'user-1',
+        creatorId: MOCK_USER_ID,
       });
 
       expect(mockPrisma.notification.create).toHaveBeenCalledWith({
@@ -147,7 +152,7 @@ describe('NotificationsService', () => {
       await service.onWorkspaceInvite({
         workspaceName: 'Dev Team',
         inviterName: 'Admin',
-        userId: 'user-3',
+        userId: MOCK_USER_ID_3,
       });
 
       expect(mockPrisma.notification.create).toHaveBeenCalledWith({

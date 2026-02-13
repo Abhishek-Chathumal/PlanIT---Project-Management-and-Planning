@@ -4,6 +4,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { JwtModule } from '@nestjs/jwt';
 import { HealthController } from './health/health.controller';
 import { AuthProxyController } from './proxy/auth-proxy.controller';
 import { UsersProxyController } from './proxy/users-proxy.controller';
@@ -19,6 +20,9 @@ const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '../../.env',
+    }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'jwt-secret-change-me',
     }),
     ClientsModule.register([
       {

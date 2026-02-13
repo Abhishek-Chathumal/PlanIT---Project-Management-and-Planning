@@ -1,5 +1,9 @@
+// ============================================
+// Notifications Proxy Controller — extracts userId from JWT
+// ============================================
 import { Controller, Get, Patch, Delete, Param, Inject, Headers } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { JwtService } from '@nestjs/jwt';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
 
@@ -7,23 +11,32 @@ import { firstValueFrom } from 'rxjs';
 @ApiBearerAuth()
 @Controller('notifications')
 export class NotificationsProxyController {
-  constructor(@Inject('NOTIFICATIONS_SERVICE') private readonly notificationsClient: ClientProxy) {}
+  constructor(
+    @Inject('NOTIFICATIONS_SERVICE') private readonly notificationsClient: ClientProxy,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  /** Extract the userId (sub claim) from an Authorization header. */
+  private extractUserId(authHeader: string): string {
+    const token = authHeader?.replace('Bearer ', '');
+    const payload = this.jwtService.verify(token, {
+      secret: process.env.JWT_SECRET || 'jwt-secret-change-me',
+    });
+    return payload.sub;
+  }
 
   @Get()
   @ApiOperation({ summary: 'Get all notifications for current user' })
   async findAll(@Headers('authorization') authHeader: string) {
-    // TODO: extract userId from JWT
-    return firstValueFrom(
-      this.notificationsClient.send('notifications.findAll', { userId: 'temp', authHeader }),
-    );
+    const userId = this.extractUserId(authHeader);
+    return firstValueFrom(this.notificationsClient.send('notifications.findAll', { userId }));
   }
 
   @Get('unread-count')
   @ApiOperation({ summary: 'Get unread notification count' })
   async unreadCount(@Headers('authorization') authHeader: string) {
-    return firstValueFrom(
-      this.notificationsClient.send('notifications.unreadCount', { userId: 'temp', authHeader }),
-    );
+    const userId = this.extractUserId(authHeader);
+    return firstValueFrom(this.notificationsClient.send('notifications.unreadCount', { userId }));
   }
 
   @Patch(':id/read')
@@ -35,9 +48,8 @@ export class NotificationsProxyController {
   @Patch('read-all')
   @ApiOperation({ summary: 'Mark all notifications as read' })
   async markAllRead(@Headers('authorization') authHeader: string) {
-    return firstValueFrom(
-      this.notificationsClient.send('notifications.markAllRead', { userId: 'temp', authHeader }),
-    );
+    const userId = this.extractUserId(authHeader);
+    return firstValueFrom(this.notificationsClient.send('notifications.markAllRead', { userId }));
   }
 
   @Delete(':id')

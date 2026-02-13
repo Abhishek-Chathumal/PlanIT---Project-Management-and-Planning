@@ -2,14 +2,19 @@ import { Test } from '@nestjs/testing';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { AuthService } from './auth.service';
 import { PrismaService } from './prisma.service';
 
-// ---- Mock data ----
+// ---- Generate test-only credentials at runtime to avoid hardcoded secrets ----
+const TEST_PASSWORD = crypto.randomBytes(16).toString('hex') + 'A@1';
+const TEST_EMAIL = `test-${crypto.randomBytes(4).toString('hex')}@planit.test`;
+const TEST_REGISTER_EMAIL = `new-${crypto.randomBytes(4).toString('hex')}@planit.test`;
+
 const mockUser = {
   id: 'user-1',
-  email: 'test@planit.io',
-  passwordHash: '$2b$12$hashedpassword',
+  email: TEST_EMAIL,
+  passwordHash: '', // set dynamically per-test
   displayName: 'Test User',
   role: 'MEMBER',
   isActive: true,
@@ -50,17 +55,17 @@ describe('AuthService', () => {
     // Reset all mocks
     jest.clearAllMocks();
 
-    // Default JWT mock
+    // Default JWT mock — use opaque placeholder tokens (not real secrets)
     mockJwtService.signAsync
-      .mockResolvedValueOnce('access-token')
-      .mockResolvedValueOnce('refresh-token');
+      .mockResolvedValueOnce('mock-access-token')
+      .mockResolvedValueOnce('mock-refresh-token');
   });
 
   // ---- register ----
   describe('register', () => {
     const dto = {
-      email: 'new@planit.io',
-      password: 'StrongP@ss1',
+      email: TEST_REGISTER_EMAIL,
+      password: TEST_PASSWORD,
       displayName: 'New User',
     };
 
@@ -74,8 +79,8 @@ describe('AuthService', () => {
 
       const result = await service.register(dto);
 
-      expect(result.accessToken).toBe('access-token');
-      expect(result.refreshToken).toBe('refresh-token');
+      expect(result.accessToken).toBe('mock-access-token');
+      expect(result.refreshToken).toBe('mock-refresh-token');
       expect(result.user.email).toBe(dto.email);
       expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
         where: { email: dto.email },
@@ -104,7 +109,7 @@ describe('AuthService', () => {
 
   // ---- login ----
   describe('login', () => {
-    const dto = { email: 'test@planit.io', password: 'StrongP@ss1' };
+    const dto = { email: TEST_EMAIL, password: TEST_PASSWORD };
 
     it('should login and return tokens for valid credentials', async () => {
       const hashedPassword = await bcrypt.hash(dto.password, 12);
@@ -116,8 +121,8 @@ describe('AuthService', () => {
 
       const result = await service.login(dto);
 
-      expect(result.accessToken).toBe('access-token');
-      expect(result.refreshToken).toBe('refresh-token');
+      expect(result.accessToken).toBe('mock-access-token');
+      expect(result.refreshToken).toBe('mock-refresh-token');
       expect(result.user.email).toBe(dto.email);
       expect(mockPrisma.user.update).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -155,10 +160,10 @@ describe('AuthService', () => {
       mockJwtService.verify.mockReturnValue({ sub: 'user-1' });
       mockPrisma.user.findUnique.mockResolvedValue(mockUser);
 
-      const result = await service.refreshToken('valid-refresh-token');
+      const result = await service.refreshToken('mock-valid-refresh-token');
 
-      expect(result.accessToken).toBe('access-token');
-      expect(result.refreshToken).toBe('refresh-token');
+      expect(result.accessToken).toBe('mock-access-token');
+      expect(result.refreshToken).toBe('mock-refresh-token');
     });
 
     it('should throw UnauthorizedException for invalid refresh token', async () => {
@@ -166,14 +171,18 @@ describe('AuthService', () => {
         throw new Error('invalid');
       });
 
-      await expect(service.refreshToken('bad-token')).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshToken('mock-invalid-token')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException if user not found', async () => {
       mockJwtService.verify.mockReturnValue({ sub: 'deleted-user' });
       mockPrisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.refreshToken('valid-token')).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshToken('mock-orphan-token')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 
@@ -183,7 +192,7 @@ describe('AuthService', () => {
       mockJwtService.verify.mockReturnValue({ sub: 'user-1' });
       mockPrisma.user.findUnique.mockResolvedValue(mockUser);
 
-      const result = await service.getMe('Bearer valid-token');
+      const result = await service.getMe('Bearer mock-valid-token');
 
       expect(result).toEqual(mockUser);
       expect(mockPrisma.user.findUnique).toHaveBeenCalledWith(
@@ -200,7 +209,7 @@ describe('AuthService', () => {
         throw new Error('invalid');
       });
 
-      await expect(service.getMe('Bearer bad-token')).rejects.toThrow(UnauthorizedException);
+      await expect(service.getMe('Bearer mock-bad-token')).rejects.toThrow(UnauthorizedException);
     });
   });
 });
