@@ -77,6 +77,25 @@ export default [
         },
         rules: {
             "no-console": ["warn", { allow: ["log", "warn", "error", "info"] }],
+            // NestJS DI requires runtime class references, not type-only imports
+            "@typescript-eslint/consistent-type-imports": "off",
+        },
+    },
+
+    // Test files — Jest globals
+    {
+        files: ["**/*.spec.ts", "**/*.test.ts", "**/*.spec.tsx", "**/*.test.tsx"],
+        languageOptions: {
+            globals: {
+                jest: "readonly",
+                describe: "readonly",
+                it: "readonly",
+                expect: "readonly",
+                beforeEach: "readonly",
+                afterEach: "readonly",
+                beforeAll: "readonly",
+                afterAll: "readonly",
+            },
         },
     },
 

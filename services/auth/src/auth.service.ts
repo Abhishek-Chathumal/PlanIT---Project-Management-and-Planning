@@ -1,7 +1,7 @@
 import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
-import type { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import type { PrismaService } from './prisma.service';
+import { PrismaService } from './prisma.service';
 
 const BCRYPT_ROUNDS = 12;
 

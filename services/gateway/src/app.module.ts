@@ -10,6 +10,7 @@ import { UsersProxyController } from './proxy/users-proxy.controller';
 import { WorkspacesProxyController } from './proxy/workspaces-proxy.controller';
 import { ProjectsProxyController } from './proxy/projects-proxy.controller';
 import { TasksProxyController } from './proxy/tasks-proxy.controller';
+import { NotificationsProxyController } from './proxy/notifications-proxy.controller';
 
 const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
 
@@ -54,6 +55,7 @@ const NATS_URL = process.env.NATS_URL || 'nats://localhost:4222';
     WorkspacesProxyController,
     ProjectsProxyController,
     TasksProxyController,
+    NotificationsProxyController,
   ],
 })
 export class AppModule {}

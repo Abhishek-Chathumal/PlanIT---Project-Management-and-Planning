@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import type { WorkspacesService } from './workspaces.service';
+import { WorkspacesService } from './workspaces.service';
 import type { WorkspaceRole } from '@prisma/client';
 
 @Controller()
