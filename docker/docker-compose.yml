@@ -1,0 +1,41 @@
+# ============================================
+# PlanIT.IO — Docker Compose (Development)
+# ============================================
+# Usage: docker compose up -d
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: planit-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: planit
+      POSTGRES_PASSWORD: planit_dev
+      POSTGRES_DB: planit_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U planit -d planit_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nats:
+    image: nats:2-alpine
+    container_name: planit-nats
+    restart: unless-stopped
+    ports:
+      - "4222:4222" # Client connections
+      - "8222:8222" # HTTP monitoring
+    command: ["--http_port", "8222", "--js"] # Enable JetStream
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8222/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local

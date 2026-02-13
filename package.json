@@ -1,0 +1,50 @@
+{
+  "name": "planit-io",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PlanIT.IO — Cross-platform project management & planning application",
+  "author": "PlanIT.IO Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css,html}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css,html}\"",
+    "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "db:migrate": "pnpm --filter @planit/prisma migrate dev",
+    "db:seed": "pnpm --filter @planit/prisma seed",
+    "db:studio": "pnpm --filter @planit/prisma studio",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "eslint": "^9.19.0",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "prettier": "^3.4.2",
+    "turbo": "^2.4.2",
+    "typescript": "^5.7.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css,html}": [
+      "prettier --write"
+    ]
+  }
+}
