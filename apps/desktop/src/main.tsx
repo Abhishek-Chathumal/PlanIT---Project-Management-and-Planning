@@ -4,6 +4,7 @@ import { RouterProvider } from '@tanstack/react-router';
 import { router } from './router';
 import { useAuthStore } from './stores/auth-store';
 import './styles/index.css';
+import './styles/App.css';
 
 // Restore session before first render
 useAuthStore.getState().restoreSession();
