@@ -14,6 +14,7 @@ export interface Task {
   assigneeId: string | null;
   creatorId: string;
   dueDate: string | null;
+  progress: number;
   assignee?: { id: string; displayName: string } | null;
   subtasks?: Subtask[];
   comments?: Comment[];
