@@ -82,6 +82,28 @@ export default [
         },
     },
 
+    // Frontend apps — Browser globals
+    {
+        files: ["apps/**/*.ts", "apps/**/*.tsx"],
+        languageOptions: {
+            globals: {
+                window: "readonly",
+                document: "readonly",
+                localStorage: "readonly",
+                sessionStorage: "readonly",
+                fetch: "readonly",
+                Request: "readonly",
+                Response: "readonly",
+                Headers: "readonly",
+                RequestInit: "readonly",
+                URL: "readonly",
+                HTMLElement: "readonly",
+                React: "readonly",
+                JSX: "readonly",
+            },
+        },
+    },
+
     // Test files — Jest globals
     {
         files: ["**/*.spec.ts", "**/*.test.ts", "**/*.spec.tsx", "**/*.test.tsx"],
