@@ -1,11 +1,21 @@
 // ============================================
 // AppLayout — Sidebar + content area
 // ============================================
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate } from '@tanstack/react-router';
-import { LayoutDashboard, KanbanSquare, LogOut, ChevronDown, FolderKanban } from 'lucide-react';
+import {
+  LayoutDashboard,
+  KanbanSquare,
+  LogOut,
+  ChevronDown,
+  FolderKanban,
+  Plus,
+  Users,
+} from 'lucide-react';
 import { useAuthStore } from '../stores/auth-store';
 import { useWorkspaceStore } from '../stores/workspace-store';
+import { CreateWorkspaceModal } from '../features/workspace/CreateWorkspaceModal';
+import { CreateProjectModal } from '../features/project/CreateProjectModal';
 import '../styles/layout.css';
 
 export function AppLayout() {
@@ -21,6 +31,9 @@ export function AppLayout() {
     selectWorkspace,
     selectProject,
   } = useWorkspaceStore();
+
+  const [isWorkspaceModalOpen, setIsWorkspaceModalOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
   useEffect(() => {
     fetchWorkspaces();
@@ -42,7 +55,16 @@ export function AppLayout() {
 
         {/* Workspace selector */}
         <div className="sidebar-section">
-          <label className="sidebar-label">Workspace</label>
+          <div className="sidebar-label-row">
+            <label className="sidebar-label">Workspace</label>
+            <button
+              className="icon-btn"
+              onClick={() => setIsWorkspaceModalOpen(true)}
+              title="Create Workspace"
+            >
+              <Plus size={16} />
+            </button>
+          </div>
           <div className="workspace-select">
             <select
               value={selectedWorkspace?.id ?? ''}
@@ -67,8 +89,22 @@ export function AppLayout() {
             <LayoutDashboard size={18} />
             <span>Dashboard</span>
           </Link>
+          <Link to="/members" className="nav-item" activeProps={{ className: 'nav-item active' }}>
+            <Users size={18} />
+            <span>Members</span>
+          </Link>
 
-          <div className="nav-group-label">Projects</div>
+          <div className="nav-group-label-row">
+            <div className="nav-group-label">Projects</div>
+            <button
+              className="icon-btn"
+              onClick={() => setIsProjectModalOpen(true)}
+              title="Create Project"
+              disabled={!selectedWorkspace}
+            >
+              <Plus size={16} />
+            </button>
+          </div>
           {projects.map((project) => (
             <Link
               key={project.id}
@@ -92,16 +128,25 @@ export function AppLayout() {
             <div className="user-avatar">{user?.displayName?.charAt(0).toUpperCase() ?? '?'}</div>
             <span className="user-name">{user?.displayName}</span>
           </div>
-          <button className="logout-btn" onClick={handleLogout} title="Logout">
+          <button className="icon-btn" onClick={handleLogout} title="Logout">
             <LogOut size={18} />
           </button>
         </div>
       </aside>
 
-      {/* ── Main content ── */}
       <main className="main-content">
         <Outlet />
       </main>
+
+      <CreateWorkspaceModal
+        isOpen={isWorkspaceModalOpen}
+        onClose={() => setIsWorkspaceModalOpen(false)}
+      />
+
+      <CreateProjectModal
+        isOpen={isProjectModalOpen}
+        onClose={() => setIsProjectModalOpen(false)}
+      />
     </div>
   );
 }

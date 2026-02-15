@@ -13,6 +13,7 @@ import { AppLayout } from './layouts/AppLayout';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { BoardPage } from './pages/BoardPage';
+import { MembersPage } from './pages/MembersPage';
 
 // ---- Root route ----
 const rootRoute = createRootRoute({
@@ -58,6 +59,12 @@ const boardRoute = createRoute({
   component: BoardPage,
 });
 
+const membersRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/members',
+  component: MembersPage,
+});
+
 // ---- Index redirect ----
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -72,7 +79,7 @@ const indexRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
-  appLayoutRoute.addChildren([dashboardRoute, boardRoute]),
+  appLayoutRoute.addChildren([dashboardRoute, boardRoute, membersRoute]),
 ]);
 
 export const router = createRouter({ routeTree });

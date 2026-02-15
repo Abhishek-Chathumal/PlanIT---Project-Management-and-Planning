@@ -46,7 +46,7 @@ export interface TaskLabel {
 
 export const tasksApi = {
   async listByBucket(bucketId: string): Promise<Task[]> {
-    return apiFetch<Task[]>(`/buckets/${bucketId}/tasks`);
+    return apiFetch<Task[]>(`/tasks?bucketId=${bucketId}`);
   },
 
   async get(id: string): Promise<Task> {
@@ -72,7 +72,14 @@ export const tasksApi = {
     data: Partial<
       Pick<
         Task,
-        'title' | 'description' | 'priority' | 'status' | 'dueDate' | 'assigneeId' | 'bucketId'
+        | 'title'
+        | 'description'
+        | 'priority'
+        | 'status'
+        | 'dueDate'
+        | 'assigneeId'
+        | 'bucketId'
+        | 'position'
       >
     >,
   ): Promise<Task> {
@@ -93,9 +100,15 @@ export const tasksApi = {
     });
   },
 
-  async toggleSubtask(taskId: string, subtaskId: string): Promise<Subtask> {
-    return apiFetch<Subtask>(`/tasks/${taskId}/subtasks/${subtaskId}/toggle`, {
+  async toggleSubtask(_taskId: string, subtaskId: string): Promise<Subtask> {
+    return apiFetch<Subtask>(`/tasks/subtasks/${subtaskId}/toggle`, {
       method: 'PATCH',
+    });
+  },
+
+  async deleteSubtask(_taskId: string, subtaskId: string): Promise<void> {
+    return apiFetch<void>(`/tasks/subtasks/${subtaskId}`, {
+      method: 'DELETE',
     });
   },
 

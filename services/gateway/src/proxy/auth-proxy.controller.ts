@@ -1,4 +1,14 @@
-import { Controller, Post, Get, Body, Inject, HttpCode, HttpStatus, Headers } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Inject,
+  HttpCode,
+  HttpStatus,
+  Headers,
+  UnauthorizedException,
+} from '@nestjs/common';
 import type { ClientProxy } from '@nestjs/microservices';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { firstValueFrom } from 'rxjs';
@@ -30,7 +40,10 @@ export class AuthProxyController {
 
   @Get('me')
   @ApiOperation({ summary: 'Get current authenticated user' })
-  async me(@Headers('authorization') authHeader: string) {
+  async me(@Headers('authorization') authHeader?: string) {
+    if (!authHeader) {
+      throw new UnauthorizedException('No authorization header');
+    }
     return firstValueFrom(this.authClient.send('auth.me', { authHeader }));
   }
 }

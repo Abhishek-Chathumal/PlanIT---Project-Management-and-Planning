@@ -2,6 +2,18 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { TasksService } from './tasks.service';
 
+function extractUserIdFromAuth(authHeader: string): string {
+  try {
+    const token = authHeader?.replace('Bearer ', '');
+    const parts = token.split('.');
+    if (!parts[1]) return '';
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+    return payload.sub;
+  } catch {
+    return '';
+  }
+}
+
 @Controller()
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
@@ -19,9 +31,9 @@ export class TasksController {
       authHeader: string;
     },
   ) {
-    const { authHeader: _authHeader, ...rest } = data;
-    // TODO: decode JWT to get creatorId from auth service
-    return this.tasksService.create({ ...rest, creatorId: 'temp-user-id' });
+    const { authHeader, ...rest } = data;
+    const creatorId = extractUserIdFromAuth(authHeader);
+    return this.tasksService.create({ ...rest, creatorId });
   }
 
   @MessagePattern('tasks.findByBucket')
@@ -66,9 +78,9 @@ export class TasksController {
 
   @MessagePattern('comments.create')
   async addComment(@Payload() data: { taskId: string; content: string; authHeader: string }) {
-    const { authHeader: _authHeader, ...rest } = data;
-    // TODO: decode JWT to get authorId
-    return this.tasksService.addComment(rest.taskId, 'temp-user-id', rest.content);
+    const { authHeader, ...rest } = data;
+    const authorId = extractUserIdFromAuth(authHeader);
+    return this.tasksService.addComment(rest.taskId, authorId, rest.content);
   }
 
   @MessagePattern('comments.delete')

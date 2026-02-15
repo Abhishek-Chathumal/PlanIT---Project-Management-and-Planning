@@ -70,3 +70,8 @@ temp/
 
 # Snyk Security Extension - AI Rules (auto-generated)
 .agent/rules/snyk_rules.md
+
+# Vite build artifacts
+apps/desktop/vite.config.d.ts
+apps/desktop/vite.config.d.ts.map
+apps/desktop/vite.config.js

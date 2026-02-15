@@ -5,23 +5,19 @@
 .app-layout {
   display: flex;
   height: 100vh;
-  background: var(--bg-primary, #0f1117);
-  color: var(--text-primary, #e4e4e7);
-  font-family:
-    'Inter',
-    'Segoe UI',
-    -apple-system,
-    sans-serif;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
 }
 
 /* ── Sidebar ── */
 .sidebar {
-  width: 260px;
-  min-width: 260px;
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
   display: flex;
   flex-direction: column;
-  background: var(--bg-sidebar, #16181f);
-  border-right: 1px solid var(--border, #2a2d38);
+  background: var(--color-bg-secondary);
+  border-right: 1px solid var(--color-border);
   padding: 0;
   overflow-y: auto;
 }
@@ -31,14 +27,14 @@
   align-items: center;
   gap: 10px;
   padding: 20px 16px 12px;
-  color: var(--accent, #818cf8);
+  color: var(--color-accent);
 }
 
 .sidebar-brand {
   font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #818cf8, #c084fc);
+  background: linear-gradient(135deg, var(--color-accent), #c084fc);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -48,13 +44,27 @@
   padding: 8px 16px;
 }
 
+.sidebar-label-row,
+.nav-group-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+/* Specific adjustment for nav group to match padding */
+.nav-group-label-row {
+  padding: 12px 12px 0;
+  margin-bottom: 4px;
+}
+
 .sidebar-label {
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-muted, #71717a);
-  margin-bottom: 6px;
+  color: var(--color-text-muted);
+  margin-bottom: 0;
   display: block;
 }
 
@@ -65,18 +75,19 @@
 .workspace-select select {
   width: 100%;
   appearance: none;
-  background: var(--bg-elevated, #1e2028);
-  border: 1px solid var(--border, #2a2d38);
-  border-radius: 8px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: 8px 32px 8px 12px;
   font-size: 0.85rem;
-  color: var(--text-primary, #e4e4e7);
+  color: var(--color-text-primary);
   cursor: pointer;
   transition: border-color 0.2s;
 }
 
 .workspace-select select:hover {
-  border-color: var(--accent, #818cf8);
+  border-color: var(--color-accent);
+  background: var(--color-bg-elevated);
 }
 
 .select-chevron {
@@ -84,7 +95,7 @@
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--text-muted, #71717a);
+  color: var(--color-text-muted);
   pointer-events: none;
 }
 
@@ -97,25 +108,35 @@
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  border-radius: 8px;
-  color: var(--text-secondary, #a1a1aa);
+  gap: 12px;
+  padding: 10px 14px;
+  /* Increased padding */
+  border-radius: 6px;
+  color: var(--color-text-secondary);
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
+  /* Larger font */
   font-weight: 500;
-  transition: all 0.15s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  margin-bottom: 2px;
 }
 
 .nav-item:hover {
-  background: var(--bg-elevated, #1e2028);
-  color: var(--text-primary, #e4e4e7);
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+  transform: translateX(4px);
+  /* Subtle meaningful scale/move */
 }
 
 .nav-item.active {
-  background: rgba(129, 140, 248, 0.12);
-  color: var(--accent, #818cf8);
+  background: rgba(99, 102, 241, 0.1);
+  /* Cleaner background */
+  color: var(--color-accent);
+  font-weight: 600;
+  /* Removed border-left, using background highlight only for cleaner look? 
+     Or keep border but make it cleaner? 
+     Let's try a pill style active state instead of border-left */
 }
 
 .nav-group-label {
@@ -123,14 +144,15 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-muted, #71717a);
-  padding: 16px 12px 4px;
+  color: var(--color-text-muted);
+  padding: 0;
+  /* Handled by row */
 }
 
 .nav-empty {
   padding: 8px 12px;
   font-size: 0.8rem;
-  color: var(--text-muted, #71717a);
+  color: var(--color-text-muted);
   font-style: italic;
 }
 
@@ -140,7 +162,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-top: 1px solid var(--border, #2a2d38);
+  border-top: 1px solid var(--color-border);
 }
 
 .user-info {
@@ -153,7 +175,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #818cf8, #c084fc);
+  background: linear-gradient(135deg, var(--color-accent), #c084fc);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -165,26 +187,7 @@
 .user-name {
   font-size: 0.82rem;
   font-weight: 500;
-  color: var(--text-primary, #e4e4e7);
-}
-
-.logout-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: none;
-  background: transparent;
-  color: var(--text-muted, #71717a);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.logout-btn:hover {
-  background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
+  color: var(--color-text-primary);
 }
 
 /* ── Main Content ── */
@@ -192,5 +195,5 @@
   flex: 1;
   overflow-y: auto;
   padding: 24px 32px;
-  background: var(--bg-primary, #0f1117);
+  background: var(--color-bg-primary);
 }

@@ -2,7 +2,7 @@
 // PlanIT.IO — API Client (Typed fetch wrapper)
 // ============================================
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
 let accessToken: string | null = null;
 let refreshToken: string | null = null;

@@ -16,6 +16,8 @@ interface WorkspaceState {
   selectWorkspace: (workspace: Workspace) => void;
   selectProject: (project: Project) => void;
   fetchProjects: (workspaceId: string) => Promise<void>;
+  createWorkspace: (name: string, description?: string) => Promise<void>;
+  createProject: (workspaceId: string, name: string, description?: string) => Promise<void>;
 }
 
 export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
@@ -59,5 +61,19 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     } catch {
       set({ projects: [] });
     }
+  },
+
+  createWorkspace: async (name, description) => {
+    const ws = await workspacesApi.create({ name, description });
+    const { workspaces } = get();
+    set({ workspaces: [...workspaces, ws], selectedWorkspace: ws });
+    // Fetch projects for new workspace (empty)
+    set({ projects: [], selectedProject: null });
+  },
+
+  createProject: async (workspaceId, name, description) => {
+    const project = await projectsApi.create(workspaceId, { name, description });
+    const { projects } = get();
+    set({ projects: [...projects, project], selectedProject: project });
   },
 }));

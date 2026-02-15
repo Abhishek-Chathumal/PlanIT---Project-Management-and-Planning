@@ -88,9 +88,15 @@ export const projectsApi = {
   },
 
   async createBucket(boardId: string, data: { name: string }): Promise<Bucket> {
-    return apiFetch<Bucket>(`/boards/${boardId}/buckets`, {
+    return apiFetch<Bucket>(`/projects/boards/${boardId}/buckets`, {
       method: 'POST',
       body: JSON.stringify(data),
+    });
+  },
+
+  async deleteBucket(bucketId: string): Promise<void> {
+    return apiFetch<void>(`/projects/buckets/${bucketId}`, {
+      method: 'DELETE',
     });
   },
 };
