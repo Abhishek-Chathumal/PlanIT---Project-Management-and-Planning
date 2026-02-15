@@ -190,6 +190,12 @@
   color: var(--color-text-primary);
 }
 
+.sidebar-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* ── Main Content ── */
 .main-content {
   flex: 1;

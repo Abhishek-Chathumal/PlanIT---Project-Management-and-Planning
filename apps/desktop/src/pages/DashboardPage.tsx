@@ -15,8 +15,8 @@ import {
 import { useWorkspaceStore } from '../stores/workspace-store';
 import { useAuthStore } from '../stores/auth-store';
 import { CreateProjectModal } from '../features/project/CreateProjectModal';
-import { tasksApi } from '../api';
-import type { Task } from '../api';
+import { tasksApi, notificationsApi } from '../api';
+import type { Task, Notification } from '../api';
 import '../styles/dashboard.css';
 
 interface DashboardStats {
@@ -40,6 +40,7 @@ export function DashboardPage() {
   });
   const [recentTasks, setRecentTasks] = useState<Task[]>([]);
   const [assignedTasks, setAssignedTasks] = useState<Task[]>([]);
+  const [activityItems, setActivityItems] = useState<Notification[]>([]);
 
   useEffect(() => {
     if (!selectedWorkspace) return;
@@ -89,6 +90,18 @@ export function DashboardPage() {
     };
 
     loadTasks();
+
+    // Load activity from notifications
+    const loadActivity = async () => {
+      try {
+        const items = await notificationsApi.list();
+        setActivityItems(Array.isArray(items) ? items.slice(0, 10) : []);
+      } catch {
+        // Notifications might not be ready
+      }
+    };
+
+    loadActivity();
   }, [selectedWorkspace, projects, user]);
 
   const STATUS_ICON: Record<string, React.ReactNode> = {
@@ -96,6 +109,24 @@ export function DashboardPage() {
     IN_PROGRESS: <Clock size={14} style={{ color: '#3b82f6' }} />,
     IN_REVIEW: <AlertTriangle size={14} style={{ color: '#f59e0b' }} />,
     DONE: <CheckCircle2 size={14} style={{ color: '#22c55e' }} />,
+  };
+
+  const ACTIVITY_ICONS: Record<string, string> = {
+    TASK_ASSIGNED: '📋',
+    TASK_COMPLETED: '✅',
+    COMMENT_ADDED: '💬',
+    DUE_REMINDER: '⏰',
+    WORKSPACE_INVITE: '📩',
+  };
+
+  const timeAgo = (dateStr: string): string => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    return `${Math.floor(hrs / 24)}d ago`;
   };
 
   return (
@@ -206,6 +237,28 @@ export function DashboardPage() {
           </div>
         )}
       </section>
+
+      {/* Recent Activity */}
+      {activityItems.length > 0 && (
+        <section className="recent-section">
+          <h3 className="section-title">
+            <Clock size={18} />
+            Recent Activity
+          </h3>
+          <div className="activity-list">
+            {activityItems.map((item) => (
+              <div key={item.id} className={`activity-item ${item.read ? '' : 'unread'}`}>
+                <span className="activity-icon">{ACTIVITY_ICONS[item.type] ?? '🔔'}</span>
+                <div className="activity-content">
+                  <span className="activity-title">{item.title}</span>
+                  <span className="activity-message">{item.message}</span>
+                </div>
+                <span className="activity-time">{timeAgo(item.createdAt)}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Quick links */}
       <section className="quick-links">

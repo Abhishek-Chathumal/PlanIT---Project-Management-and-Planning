@@ -14,6 +14,7 @@ import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { BoardPage } from './pages/BoardPage';
 import { MembersPage } from './pages/MembersPage';
+import { SettingsPage } from './pages/SettingsPage';
 
 // ---- Root route ----
 const rootRoute = createRootRoute({
@@ -65,6 +66,12 @@ const membersRoute = createRoute({
   component: MembersPage,
 });
 
+const settingsRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/settings',
+  component: SettingsPage,
+});
+
 // ---- Index redirect ----
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -79,7 +86,7 @@ const indexRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
-  appLayoutRoute.addChildren([dashboardRoute, boardRoute, membersRoute]),
+  appLayoutRoute.addChildren([dashboardRoute, boardRoute, membersRoute, settingsRoute]),
 ]);
 
 export const router = createRouter({ routeTree });

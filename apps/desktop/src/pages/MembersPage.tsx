@@ -64,6 +64,9 @@ export function MembersPage() {
     VIEWER: filteredMembers.filter((m) => m.role === 'VIEWER'),
   };
 
+  const isValidUrl = (url?: string) =>
+    url && (url.startsWith('http://') || url.startsWith('https://'));
+
   if (loading) {
     return (
       <div className="members-page">
@@ -172,11 +175,11 @@ export function MembersPage() {
           </div>
         ) : (
           filteredMembers.map((member) => {
-            const roleConfig = ROLE_CONFIG[member.role] ?? ROLE_CONFIG.MEMBER;
+            const roleConfig = ROLE_CONFIG[member.role] ?? ROLE_CONFIG.MEMBER!;
             return (
               <div key={member.id} className="member-card">
                 <div className="member-avatar">
-                  {member.user.avatarUrl ? (
+                  {isValidUrl(member.user.avatarUrl) ? (
                     <img src={member.user.avatarUrl} alt="" />
                   ) : (
                     <span>{member.user.displayName.charAt(0).toUpperCase()}</span>

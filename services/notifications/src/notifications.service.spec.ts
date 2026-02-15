@@ -2,10 +2,10 @@ import { Test } from '@nestjs/testing';
 import { NotificationsService } from './notifications.service';
 import { PrismaService } from './prisma.service';
 
-const MOCK_USER_ID = 'test-user-001';
-const MOCK_USER_ID_2 = 'test-user-002';
-const MOCK_USER_ID_3 = 'test-user-003';
-const MOCK_NOTIF_ID = 'test-notif-001';
+const MOCK_USER_ID = '00000000-0000-0000-0000-000000000001';
+const MOCK_USER_ID_2 = '00000000-0000-0000-0000-000000000002';
+const MOCK_USER_ID_3 = '00000000-0000-0000-0000-000000000003';
+const MOCK_NOTIF_ID = '00000000-0000-0000-0000-000000000004';
 
 const mockNotification = {
   id: MOCK_NOTIF_ID,

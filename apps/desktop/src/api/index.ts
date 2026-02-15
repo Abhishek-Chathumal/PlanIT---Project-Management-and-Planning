@@ -7,3 +7,5 @@ export { tasksApi } from './tasks';
 export type { Task, Subtask, Comment, TaskLabel } from './tasks';
 export { notificationsApi } from './notifications';
 export type { Notification } from './notifications';
+export { usersApi } from './users';
+export type { UserProfile } from './users';

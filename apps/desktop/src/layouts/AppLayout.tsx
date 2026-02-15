@@ -11,11 +11,13 @@ import {
   FolderKanban,
   Plus,
   Users,
+  Settings,
 } from 'lucide-react';
 import { useAuthStore } from '../stores/auth-store';
 import { useWorkspaceStore } from '../stores/workspace-store';
 import { CreateWorkspaceModal } from '../features/workspace/CreateWorkspaceModal';
 import { CreateProjectModal } from '../features/project/CreateProjectModal';
+import { NotificationCenter } from '../features/notifications/NotificationCenter';
 import '../styles/layout.css';
 
 export function AppLayout() {
@@ -93,6 +95,10 @@ export function AppLayout() {
             <Users size={18} />
             <span>Members</span>
           </Link>
+          <Link to="/settings" className="nav-item" activeProps={{ className: 'nav-item active' }}>
+            <Settings size={18} />
+            <span>Settings</span>
+          </Link>
 
           <div className="nav-group-label-row">
             <div className="nav-group-label">Projects</div>
@@ -128,9 +134,12 @@ export function AppLayout() {
             <div className="user-avatar">{user?.displayName?.charAt(0).toUpperCase() ?? '?'}</div>
             <span className="user-name">{user?.displayName}</span>
           </div>
-          <button className="icon-btn" onClick={handleLogout} title="Logout">
-            <LogOut size={18} />
-          </button>
+          <div className="sidebar-footer-actions">
+            <NotificationCenter />
+            <button className="icon-btn" onClick={handleLogout} title="Logout">
+              <LogOut size={18} />
+            </button>
+          </div>
         </div>
       </aside>
 
